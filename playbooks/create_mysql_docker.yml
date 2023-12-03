@@ -1,6 +1,6 @@
 ---
 - name: Run MySQL Docker Container
-  hosts: all
+  hosts: localhost
   become: true
   vars:
     mysql_root_password: root
