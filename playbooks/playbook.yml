@@ -1,0 +1,103 @@
+---
+
+- name: Main playbook
+  hosts: all
+  become: true
+  vars:
+    pkg: ["docker.io","net-tools","python3-pip"]
+  roles:
+    - my_role
+
+
+    
+  tasks:
+
+
+    # -  name: ajoute index jinja page
+    #    template: 
+    #      src:  /etc/ansible/templates/index.html.j2   
+    #      dest: /var/www/html/index.nginx-debian.html
+
+
+    # - name: Afficher les facts
+    #   debug:
+    #     var: ansible_facts
+
+
+  # -  name: update apt 
+  #   #  apt: 
+  #   #    update_cache: yes     
+  #    shell: export variable=myvar
+
+
+
+  # -  name: installation packages
+  #    apt:
+  #      name: 
+  #       "{{pkg}}"  
+  #      state: present
+  
+  # - name: install docker module
+  #   pip:
+  #     name: docker
+  #     state: present
+
+
+  # -  name: ajout user au group docker
+  #    user:
+  #       name: "{{ansible_ssh_user}}"
+  #       groups: docker
+  #       append: yes
+    
+
+
+  # - name: run a docker container
+  #   docker_container: 
+  #     name: mycontainer
+  #     image: nginx
+  #     ports: "80:80"
+  #     container_default_behavior: compatibility
+  #   register: output
+
+  # -  name: execute commands
+  #    shell: |
+  #      docker ps
+  #      docker run -it -d -p 80:80 nginx
+  #    register: output
+
+  # -  name: demarrage de docker
+  #    service:
+  #      name: docker
+  #      state: restarted
+
+
+  # - name: Afficher le contenu de l'URL avec Curl
+  #   uri:
+  #     url: "localhost"  # Remplacez cette URL par l'URL que vous souhaitez afficher
+  #     return_content: yes
+  #   register: response
+
+  # - name: Afficher le contenu de la réponse
+  #   debug:
+  #     var: response
+
+  # - name: desinstalation de apache
+  #   apt:
+  #     name: apache2
+  #     state: absent
+
+  # - name: execution de commande
+  #   shell: |
+  #     sudo apt-get update -y
+  #     sudo apt-get install -y docker.io
+  #     sudo usermod -aG docker $USER
+  #     sudo service docker restart 
+  #     export niki=$USER
+  #     echo "my name is $USER"  
+  #     docker ps
+  #   register: output
+
+  # - name: afficher output
+  #   debug:
+  #     var: ansible_facts
+

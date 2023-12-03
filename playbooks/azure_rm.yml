@@ -1,0 +1,88 @@
+---
+
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  vars:
+    ssh_pub_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQD4HxjV/2/KG4AqeHia7LDjFTmKcMkAnv0uyWIto0K7IgqOBSxYMB46vOgNOtiE8qEYHs1DhTLwW1DjSN+Wmk5NAklXKESUKDvcXwhaF6dC2SqMQfvhki5aYG5IbfLbG2N+wzQ8l+oyHsr3ToNMiNnNrgi3KTcLclaTY4tGjZ7mcBeR1q4sudomU6GL5gIz8n8wRLqWhX1XiZMS8NXd1EDcGmsPJhuP9I2xgP+/FfZgxqryi98wkfsyzWM7NaIb+ghBbDc+c6Yc77ifBzFsEEMnRsjHiJT5YJu428abgQGZd968FXRquoGENUxowh00xFPJh488MSSywLKONx9Wt9ZYlLCDkkmAzlDXKTknMKJ4wG4ijnraW5os5M1qV+YZA0DZJOhaYt49lZILc27zN9+Pb+wQzldzvPnb178FGm7/RH869DcDI5z5s3Wnu1ttFv7K5ffV0181wdStpp/Z+Z98hB9Ps/5jO0739+29X4I5jXLrFnmUmf2c/KzvsK9kwH0= ywsl@LAPTOP-5CN721GA"
+  tasks:
+
+  - name: Create resource group
+    azure_rm_resourcegroup:
+      name: myResourceGroup
+      location: eastus
+
+  - name: Create virtual network
+    azure_rm_virtualnetwork:
+      resource_group: myResourceGroup
+      name: myVnet
+      address_prefixes: "10.0.0.0/16"
+
+  - name: Add subnet
+    azure_rm_subnet:
+      resource_group: myResourceGroup
+      name: mySubnet
+      address_prefix: "10.0.1.0/24"
+      virtual_network: myVnet
+
+  - name: Create public IP address
+    azure_rm_publicipaddress:
+      resource_group: myResourceGroup
+      allocation_method: Static
+      name: myPublicIP
+    register: output_ip_address
+
+  - name: Public IP of VM
+    debug:
+      msg: "The public IP is {{ output_ip_address.state.ip_address }}."
+
+  - name: Create Network Security Group that allows SSH
+    azure_rm_securitygroup:
+      resource_group: myResourceGroup
+      name: myNetworkSecurityGroup
+      rules:
+        - name: SSH
+          protocol: Tcp
+          destination_port_range: 22
+          access: Allow
+          priority: 100
+          direction: Inbound
+
+  - name: Create virtual network interface card
+    azure_rm_networkinterface:
+      resource_group: myResourceGroup
+      name: myNIC
+      virtual_network: myVnet
+      subnet: mySubnet
+      public_ip_name: myPublicIP
+      security_group: myNetworkSecurityGroup
+
+  - name: Create VM
+    azure_rm_virtualmachine:
+      resource_group: myResourceGroup
+      name: myVM
+      vm_size: Standard_B1s
+      admin_username: azureuser
+      ssh_password_enabled: false
+      ssh_public_keys:
+        - path: /home/azureuser/.ssh/authorized_keys
+          key_data: "{{ ssh_pub_key }}"
+      network_interfaces: myNIC
+      image:
+        offer: CentOS
+        publisher: OpenLogic
+        sku: '7.5'
+        version: latest
+    # register: admin_username
+
+  # - name: Get facts for all resource groups
+  #   azure_rm_resourcegroup_info:
+  #   register: output
+
+  # - name: Display resource groups data 
+  #   debug:
+  #     var: output.resourcegroups | map(attribute='name')
+
+  # - name: Display resource groups data 
+  #   debug:
+  #     var: azure_vm.os_profile.admin_username
