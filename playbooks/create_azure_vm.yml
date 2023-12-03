@@ -69,9 +69,9 @@
           key_data: "{{ ssh_pub_key }}"
       network_interfaces: myNIC
       image:
-        offer: CentOS
-        publisher: OpenLogic
-        sku: '7.5'
+        offer: UbuntuServer
+        publisher: Canonical
+        sku: 16.04-LTS
         version: latest
     # register: admin_username
 
